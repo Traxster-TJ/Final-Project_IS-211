@@ -32,11 +32,21 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
-
-@app.before_first_request
+# Create tables if they don't exist
+# Replace before_first_request with a function called from app context
 def setup():
     if not os.path.exists(DATABASE):
         init_db()
+
+# Create a new function to initialize the app
+def create_app():
+    with app.app_context():
+        setup()
+    return app
+
+# Call setup at startup
+with app.app_context():
+    setup()
 
 # Routes
 @app.route('/')
