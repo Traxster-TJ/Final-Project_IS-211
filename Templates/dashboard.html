@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Catalogue - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Book Catalogue</h1>
+            <div class="user-info">
+                Welcome, {{ session.username }}!
+                <a href="{{ url_for('logout') }}" class="btn btn-small">Logout</a>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <h2>Add a New Book</h2>
+            <form action="{{ url_for('add_book') }}" method="post">
+                <div class="form-group">
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn" required placeholder="Enter ISBN (e.g., 9781449372620)">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search & Add</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>My Books</h2>
+            {% if books %}
+                <div class="book-list">
+                    {% for book in books %}
+                        <div class="book-item">
+                            <div class="book-details">
+                                {% if book.thumbnail_url %}
+                                    <div class="book-thumbnail">
+                                        <img src="{{ book.thumbnail_url }}" alt="Cover of {{ book.title }}">
+                                    </div>
+                                {% endif %}
+                                <div class="book-info">
+                                    <h3>{{ book.title }}</h3>
+                                    <p><strong>Author:</strong> {{ book.author }}</p>
+                                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                                    <p><strong>Pages:</strong> {{ book.page_count }}</p>
+                                    <p><strong>Rating:</strong> {{ book.average_rating }}</p>
+                                </div>
+                            </div>
+                            <div class="book-actions">
+                                <form action="{{ url_for('delete_book', book_id=book.id) }}" method="post">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this book?')">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-message">You haven't added any books yet. Use the form above to add some!</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
